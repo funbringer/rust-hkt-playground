@@ -1,16 +1,16 @@
 #![allow(incomplete_features)]
 #![feature(generic_associated_types)]
 
-mod types;
-mod functor;
 mod fix;
+mod functor;
+mod types;
 
 use std::fmt::Debug;
 use std::sync::Arc;
 
-use types::*;
-use functor::*;
 use fix::*;
+use functor::*;
+use types::*;
 
 trait XBuiltin {
     type Output: Debug;
@@ -68,26 +68,18 @@ fn main() {
     let some = |x| Some(x).embed();
 
     let tree: ArcFix<Option_> = some(some(some(none)));
-    let value = tree.cata(|x|
-        match x {
-            Some(value) => value + 1,
-            None => 0,
-        }
-    );
+    let value = tree.cata(|x| match x {
+        Some(value) => value + 1,
+        None => 0,
+    });
     println!("{:?}", value);
 
     let tree: ArcFix<Vec_> = vec![
-        vec![
-            vec![].embed(),
-            vec![].embed(),
-        ].embed(),
-        vec![
-            vec![].embed(),
-        ].embed(),
-    ].embed();
+        vec![vec![].embed(), vec![].embed()].embed(),
+        vec![vec![].embed()].embed(),
+    ]
+    .embed();
 
-    let value = tree.cata(|x| {
-        x.into_iter().sum::<usize>() + 1
-    });
+    let value = tree.cata(|x| x.into_iter().sum::<usize>() + 1);
     println!("{:?}", value);
 }

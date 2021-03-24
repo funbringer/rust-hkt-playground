@@ -30,6 +30,8 @@ pub trait Recursive<T> {
     where
         F: FnMut(Me<Self::Projection, R>) -> R,
         FunctorInner<Self::Projection>: Recursive<T, Projection = Self::Projection>,
+        // Explore alternative:
+        // Self::Projection: Functor<Inner = Self>,
     {
         let inner = self.project().fmap(|x| x.cata_mut(f));
         f(inner)
@@ -95,6 +97,19 @@ mod tests {
 
         let tree: ArcFix<Option_> = None.embed();
         if let None = tree.project() {}
+    }
+
+    #[test]
+    fn test_bare_fix() {
+        // We don't have to wrap top Fix
+        let tree: Fix<Option_> = Fix(None);
+
+        if let None = tree.project() {}
+
+        tree.cata(|x| {
+            let x: ArcFix<Option_> = x.embed();
+            x
+        });
     }
 
     #[test]

@@ -1,3 +1,4 @@
+/// `Self` is a reserved keyword, so we use `Me`
 pub type Me<T, A> = <T as SelfTypeFamily>::Me<A>;
 
 /// Unfortunately, Rust doesn't have 1st class HKT.

@@ -15,7 +15,7 @@ impl<Leaf, T> TypeToType for Expr<Leaf, T> {
     type Me<A> = Expr<Leaf, A>;
 }
 
-type Expr_<T> = Expr<T, ()>;
+type Expr_<T> = Expr<T, !>;
 
 impl<Leaf, T> Functor for Expr<Leaf, T> {
     type Inner = T;
@@ -40,7 +40,7 @@ mod tests {
     use crate::fix::*;
 
     #[test]
-    fn test() {
+    fn test_eval() {
         use super::Expr::*;
 
         let value = |x| Value(x).embed();
@@ -49,12 +49,31 @@ mod tests {
 
         let tree: ArcFix<Expr_<i32>> = mul(add(value(1), value(2)), value(3));
 
-        let value = tree.cata(|x| match x {
+        let result = tree.cata(|node| match node {
             Value(x) => x,
             Add(a, b) => a + b,
             Mul(a, b) => a * b,
         });
 
-        assert_eq!(value, 9);
+        assert_eq!(result, 9);
+    }
+
+    #[test]
+    fn test_extract_values() {
+        use super::Expr::*;
+
+        let value = |x| Value(x).embed();
+        let add = |a, b| Add(a, b).embed();
+        let mul = |a, b| Mul(a, b).embed();
+
+        let tree: ArcFix<Expr_<i32>> = mul(add(value(1), value(2)), value(3));
+
+        let result = tree.cata(|node| match node {
+            Value(x) => vec![x],
+            Add(xs, ys) => [xs, ys].concat(),
+            Mul(xs, ys) => [xs, ys].concat(),
+        });
+
+        assert_eq!(result, [1, 2, 3]);
     }
 }

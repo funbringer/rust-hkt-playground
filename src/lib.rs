@@ -1,6 +1,7 @@
 #![allow(incomplete_features)]
-#![feature(generic_associated_types)]
 #![feature(assert_matches)]
+#![feature(generic_associated_types)]
+#![feature(never_type)]
 
 mod toy_lang;
 mod trees_that_grow;

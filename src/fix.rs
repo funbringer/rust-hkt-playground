@@ -20,6 +20,7 @@ pub trait Corecursive<T> {
 pub trait Recursive<T> {
     type Projection: Functor;
 
+    // TODO: maybe we should return a reference
     fn project(&self) -> Self::Projection;
 
     // cata :: (f b -> b) -> Fix f -> b

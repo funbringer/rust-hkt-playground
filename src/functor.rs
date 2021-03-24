@@ -1,8 +1,8 @@
-use crate::types::TypeToType;
+use crate::types::SelfTypeFamily;
 
 pub type FunctorInner<T> = <T as Functor>::Inner;
 
-pub trait Functor: TypeToType {
+pub trait Functor: SelfTypeFamily {
     type Inner;
 
     fn fmap<F, R>(self, f: F) -> Self::Me<R>

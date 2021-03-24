@@ -1,11 +1,12 @@
 use crate::functor::{Functor, FunctorInner};
-use crate::types::{Me, TypeToType};
+use crate::types::{Me, SelfTypeFamily};
 use std::borrow::Borrow;
 use std::sync::Arc;
 
 pub trait Corecursive<T> {
     type Container;
 
+    // embed :: f (Fix f) -> Fix f
     fn embed(&self) -> Self::Container;
 
     // TODO: do we need this one?
@@ -47,15 +48,15 @@ pub trait Recursive<T> {
 }
 
 pub type ArcFix<T> = Arc<Fix<T>>;
-pub type Unfix<T> = <T as TypeToType>::Me<ArcFix<T>>;
+pub type Unfix<T> = <T as SelfTypeFamily>::Me<ArcFix<T>>;
 
 // newtype Fix f = Fix {unFix :: f (Fix f)}
 #[repr(transparent)]
-pub struct Fix<F: TypeToType>(Unfix<F>);
+pub struct Fix<F: SelfTypeFamily>(Unfix<F>);
 
 impl<T> Corecursive<T> for Unfix<T>
 where
-    T: TypeToType,
+    T: SelfTypeFamily,
     Unfix<T>: Clone,
 {
     type Container = ArcFix<T>;
@@ -67,7 +68,7 @@ where
 
 impl<T, Tree> Recursive<T> for Tree
 where
-    T: TypeToType,
+    T: SelfTypeFamily,
     Tree: Borrow<Fix<T>>,
     Unfix<T>: Functor + Clone,
 {

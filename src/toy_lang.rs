@@ -11,7 +11,7 @@ enum Expr<Leaf, T> {
     // TODO: add more ops
 }
 
-impl<Leaf, T> TypeToType for Expr<Leaf, T> {
+impl<Leaf, T> SelfTypeFamily for Expr<Leaf, T> {
     type Me<A> = Expr<Leaf, A>;
 }
 
@@ -36,18 +36,20 @@ impl<Leaf, T> Functor for Expr<Leaf, T> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::{Expr::*, *};
     use crate::fix::*;
 
-    #[test]
-    fn test_eval() {
-        use super::Expr::*;
-
+    fn expression_tree() -> ArcFix<Expr_<i32>> {
         let value = |x| Value(x).embed();
         let add = |a, b| Add(a, b).embed();
         let mul = |a, b| Mul(a, b).embed();
 
-        let tree: ArcFix<Expr_<i32>> = mul(add(value(1), value(2)), value(3));
+        mul(add(value(1), value(2)), value(3))
+    }
+
+    #[test]
+    fn test_eval() {
+        let tree = expression_tree();
 
         let result = tree.cata(|node| match node {
             Value(x) => x,
@@ -60,13 +62,7 @@ mod tests {
 
     #[test]
     fn test_extract_values() {
-        use super::Expr::*;
-
-        let value = |x| Value(x).embed();
-        let add = |a, b| Add(a, b).embed();
-        let mul = |a, b| Mul(a, b).embed();
-
-        let tree: ArcFix<Expr_<i32>> = mul(add(value(1), value(2)), value(3));
+        let tree = expression_tree();
 
         let result = tree.cata(|node| match node {
             Value(x) => vec![x],

@@ -3,7 +3,7 @@ use crate::types::{Me, SelfTypeFamily};
 use std::borrow::Borrow;
 use std::sync::Arc;
 
-pub trait Corecursive<T> {
+pub trait Corecursive<T>: Functor {
     type Container;
 
     // embed :: f (Fix f) -> Fix f
@@ -57,7 +57,7 @@ pub struct Fix<F: SelfTypeFamily>(Unfix<F>);
 impl<T> Corecursive<T> for Unfix<T>
 where
     T: SelfTypeFamily,
-    Unfix<T>: Clone,
+    Unfix<T>: Clone + Functor,
 {
     type Container = ArcFix<T>;
 

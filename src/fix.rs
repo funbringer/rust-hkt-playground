@@ -50,6 +50,7 @@ pub type ArcFix<T> = Arc<Fix<T>>;
 pub type Unfix<T> = <T as TypeToType>::Me<ArcFix<T>>;
 
 // newtype Fix f = Fix {unFix :: f (Fix f)}
+#[repr(transparent)]
 pub struct Fix<F: TypeToType>(Unfix<F>);
 
 impl<T> Corecursive<T> for Unfix<T>

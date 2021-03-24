@@ -31,3 +31,14 @@ impl<T> Functor for Vec<T> {
         self.into_iter().map(f).collect()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test() {
+        let value = Some(&100i32).fmap(ToString::to_string);
+        assert_matches!(value.unwrap().as_ref(), "100");
+    }
+}

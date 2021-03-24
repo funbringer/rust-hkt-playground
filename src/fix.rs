@@ -76,3 +76,49 @@ where
         inner.clone()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::types::{Option_, Vec_};
+
+    #[test]
+    fn test_embed_project() {
+        let tree: ArcFix<Option_> = None.embed().into();
+        if let None = tree.project() {}
+
+        let tree: ArcFix<Option_> = None.embed_();
+        if let None = tree.project() {}
+
+        let tree: ArcFix<Option_> = None.embed();
+        if let None = tree.project() {}
+    }
+
+    #[test]
+    fn test_tree_option() {
+        let none = None.embed();
+        let some = |x| Some(x).embed();
+
+        let tree: ArcFix<Option_> = some(some(some(none)));
+
+        let value = tree.cata(|x| match x {
+            Some(value) => value + 1,
+            None => 0,
+        });
+
+        assert_eq!(value, 3);
+    }
+
+    #[test]
+    fn test_tree_vec() {
+        let tree: ArcFix<Vec_> = vec![
+            vec![vec![].embed(), vec![].embed()].embed(),
+            vec![vec![].embed()].embed(),
+        ]
+        .embed();
+
+        let value = tree.cata(|x| x.into_iter().sum::<usize>() + 1);
+
+        assert_eq!(value, 6);
+    }
+}

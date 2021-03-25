@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
-use crate::functor::*;
-use crate::types::*;
+use crate::functor::Functor;
+use crate::types::SelfTypeFamily;
 
 #[derive(Clone)]
 enum Expr<Leaf, T> {
@@ -38,6 +38,13 @@ impl<Leaf, T> Functor for Expr<Leaf, T> {
 mod tests {
     use super::{Expr::*, *};
     use crate::fix::*;
+
+    // fn add<T: Clone, G>(left: G, right: G) -> G
+    // where
+    //     G: Recursive<Expr_<T>>,
+    // {
+    //     Expr::Add(left, right).embed()
+    // }
 
     fn expression_tree() -> ArcFix<Expr_<i32>> {
         let value = |x| Value(x).embed();

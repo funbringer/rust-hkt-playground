@@ -8,4 +8,5 @@ mod trees_that_grow;
 
 pub mod fix;
 pub mod functor;
+pub mod recursion;
 pub mod types;

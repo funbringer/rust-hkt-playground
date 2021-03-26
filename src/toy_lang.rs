@@ -3,7 +3,7 @@
 use crate::functor::Functor;
 use crate::types::SelfTypeFamily;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 enum Expr<Leaf, T> {
     Value(Leaf),
     Add(T, T),

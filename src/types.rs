@@ -21,3 +21,9 @@ impl<T> SelfTypeFamily for Vec<T> {
 }
 
 pub type Vec_ = Vec<Dummy>;
+
+impl<T, const N: usize> SelfTypeFamily for [T; N] {
+    type Me<A> = [A; N];
+}
+
+pub type Array_<const N: usize> = [Dummy; N];

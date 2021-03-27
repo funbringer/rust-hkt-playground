@@ -32,13 +32,45 @@ impl<T> Functor for Vec<T> {
     }
 }
 
+impl<T, const N: usize> Functor for [T; N] {
+    type Inner = T;
+
+    fn fmap<F, R>(self, mut f: F) -> Self::Me<R>
+    where
+        F: FnMut(Self::Inner) -> R,
+    {
+        use std::mem::MaybeUninit;
+
+        let mut result: [MaybeUninit<R>; N] = MaybeUninit::uninit_array();
+
+        for (i, x) in std::array::IntoIter::new(self).enumerate() {
+            result[i] = MaybeUninit::new(f(x));
+        }
+
+        // SAFETY: we have initialized all elements
+        unsafe { MaybeUninit::array_assume_init(result) }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test() {
-        let value = Some(&100i32).fmap(ToString::to_string);
-        assert_matches!(value.unwrap().as_ref(), "100");
+    fn test_option() {
+        let value = Some(&100).fmap(i32::to_string);
+        assert_matches!(value.as_deref(), Some("100"));
+    }
+
+    #[test]
+    fn test_vec() {
+        let value = vec!["kek"].fmap(String::from);
+        assert_matches!(value[0].as_ref(), "kek");
+    }
+
+    #[test]
+    fn test_array() {
+        let value: [String; 0] = [].fmap(From::<&str>::from);
+        assert_matches!(value, []);
     }
 }

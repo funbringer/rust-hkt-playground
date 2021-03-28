@@ -41,7 +41,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::types::{Option_, Vec_};
+    use crate::types::{vec::Vec_, Option_};
 
     #[test]
     fn test_embed_project() {

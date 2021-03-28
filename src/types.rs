@@ -16,6 +16,12 @@ impl<T> SelfTypeFamily for Option<T> {
 
 pub type Option_ = Option<Dummy>;
 
+impl<T, E> SelfTypeFamily for Result<T, E> {
+    type Me<A> = Result<A, E>;
+}
+
+pub type Result_<E> = Result<Dummy, E>;
+
 impl<T> SelfTypeFamily for Vec<T> {
     type Me<A> = Vec<A>;
 }

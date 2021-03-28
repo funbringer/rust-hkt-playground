@@ -21,6 +21,17 @@ impl<T> Functor for Option<T> {
     }
 }
 
+impl<T, E> Functor for Result<T, E> {
+    type Inner = T;
+
+    fn fmap<F, R>(self, f: F) -> Self::Me<R>
+    where
+        F: FnMut(Self::Inner) -> R,
+    {
+        self.map(f)
+    }
+}
+
 impl<T> Functor for Vec<T> {
     type Inner = T;
 
@@ -63,6 +74,17 @@ mod tests {
     }
 
     #[test]
+    fn test_result() {
+        let mut value;
+
+        value = Ok(&100).fmap(usize::to_string);
+        assert_matches!(value.as_deref(), Ok("100"));
+
+        value = Err(()).fmap(|x| x);
+        assert_matches!(value, Err(()));
+    }
+
+    #[test]
     fn test_vec() {
         let value = vec!["kek"].fmap(String::from);
         assert_matches!(value[0].as_ref(), "kek");
@@ -72,5 +94,8 @@ mod tests {
     fn test_array() {
         let value: [String; 0] = [].fmap(From::<&str>::from);
         assert_matches!(value, []);
+
+        let value = [0; 100].fmap(|x| x + 1);
+        assert_eq!(value, [1; 100]);
     }
 }

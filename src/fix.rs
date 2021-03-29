@@ -69,6 +69,25 @@ mod tests {
     }
 
     #[test]
+    fn test_cata_byref() {
+        let none = None.embed();
+        let some = |x| Some(x).embed();
+
+        let tree: ArcFix<Option_> = some(some(some(none)));
+
+        // this traversal does not consume tree
+        let _value = tree.cata(|_| 0);
+
+        // ... which means that we can still use it
+        let value = tree.cata(|x| match x {
+            Some(value) => value + 1,
+            None => 0,
+        });
+
+        assert_eq!(value, 3);
+    }
+
+    #[test]
     fn test_tree_option() {
         let none = None.embed();
         let some = |x| Some(x).embed();
@@ -77,6 +96,13 @@ mod tests {
 
         let value = tree.cata(|x| match x {
             Some(value) => value + 1,
+            None => 0,
+        });
+
+        assert_eq!(value, 3);
+
+        let value = tree.para(|x| match x {
+            Some((_, value)) => value + 1,
             None => 0,
         });
 

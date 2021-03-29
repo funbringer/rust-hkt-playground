@@ -29,9 +29,33 @@ pub trait Recursive<T> {
         F: FnMut(Me<Self::Projection, R>) -> R,
         FunctorInner<Self::Projection>: Recursive<T, Projection = Self::Projection>,
     {
-        let inner = self
-            .project()
-            .fmap(|x| x.cata::<&mut dyn FnMut(Me<Self::Projection, R>) -> R, R>(&mut f));
+        // cata = f . fmap (cata f) . project
+
+        let inner = self.project().fmap(|x| {
+            // HACK: we have to erase closure's type to make rustc happy
+            x.cata::<&mut dyn FnMut(Me<Self::Projection, R>) -> R, R>(&mut f)
+        });
+
+        f(inner)
+    }
+
+    // para :: (f (Fix f, b) -> b) -> Fix f -> b
+    fn para<F, R>(&self, mut f: F) -> R
+    where
+        Self: Sized + Clone,
+        F: FnMut(Me<Self::Projection, (Self, R)>) -> R,
+        Self::Projection: Functor<Inner = Self>,
+    {
+        // para = f . fmap (\x -> (x, para f x)) . project
+
+        let inner = self.project().fmap(|x| {
+            (
+                x.clone(),
+                // HACK: we have to erase closure's type to make rustc happy
+                x.para::<&mut dyn FnMut(Me<Self::Projection, (Self, R)>) -> R, R>(&mut f),
+            )
+        });
+
         f(inner)
     }
 }
